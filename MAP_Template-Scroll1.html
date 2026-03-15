@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mutual Action Plan</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --ink: #0f0e0d;
+    --paper: #f5f2ed;
+    --cream: #ede9e2;
+    --rule: #d4cfc7;
+    --accent: #c84b2f;
+    --accent-soft: #f0e0da;
+    --them: #1a4d6e;
+    --them-soft: #daeaf5;
+    --us: #2d6a4f;
+    --us-soft: #d8f0e6;
+    --done: #2d6a4f;
+    --done-soft: #d4edda;
+    --warn: #b45309;
+    --warn-soft: #fef3c7;
+    --shadow: 0 1px 3px rgba(15,14,13,0.08), 0 4px 16px rgba(15,14,13,0.06);
+    --shadow-lg: 0 8px 32px rgba(15,14,13,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+    color: white;
+  }
+  .logo span { color: white; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 6px; font-size: 13px;
+    font-family: 'DM Sans', sans-serif; font-weight: 500;
+    cursor: pointer; border: none; transition: all 0.15s;
+    text-decoration: none;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--paper);
+    border: 1px solid rgba(245,242,237,0.25);
+  }
+  .btn-ghost:hover { background: rgba(245,242,237,0.1); }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-accent:hover { background: #b03d24; }
+  .btn-primary { background: var(--ink); color: white; }
+  .btn-primary:hover { background: #2a2927; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── MAIN LAYOUT ── */
+  .container { max-width: 1590px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── DEAL CARD ── */
+  .deal-card {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 56px;
+    z-index: 90;
+    overflow: hidden;
+  }
+  .deal-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent) 60%, var(--cream));
+  }
+  .deal-card-grid {
+    display: grid;
+    grid-template-columns: 0.5fr 0.5fr 0.5fr 0.5fr 1fr 1fr;
+    gap: 24px;
+    align-items: end;
+  }
+  .field-group label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--done);
+    margin-bottom: 6px;
+  }
+  .field-group input, .field-group select {
+    width: 100%;
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--ink);
+    transition: border-color 0.15s;
+    outline: none;
+  }
+  .field-group input:focus, .field-group select:focus {
+    border-color: var(--accent);
+    background: white;
+  }
+  .deal-title-input {
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 2px solid var(--rule) !important;
+    border-radius: 0 !important;
+    padding: 4px 0 !important;
+    font-family: 'DM Serif Display', serif !important;
+    font-size: 26px !important;
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .deal-title-input:focus { border-bottom-color: var(--accent) !important; }
+
+  /* ── PROGRESS ── */
+  .progress-section {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 20px 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  .progress-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; color: var(--done); white-space: nowrap;
+  }
+  .progress-bar-wrap {
+    flex: 1; background: var(--cream); border-radius: 100px; height: 8px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; border-radius: 100px;
+    background: linear-gradient(90deg, var(--accent), #e86d50);
+    transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .progress-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 22px; font-weight: 500;
+    color: var(--ink); min-width: 52px; text-align: right;
+  }
+  .progress-stats { display: flex; gap: 20px; }
+  .stat { text-align: center; }
+  .stat-n {
+    font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; display: block;
+  }
+  .stat-l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--done); }
+
+  /* ── TABLE SECTION ── */
+  .table-section {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .table-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  .table-header {
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--cream);
+    background: white;
+  }
+  .table-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 16px; font-weight: 400;
+  }
+    thead tr {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+  thead th {
+    text-align: left;
+    padding: 10px 14px;
+    font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--done);
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--cream);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { filter: brightness(0.97); }
+  tbody td { padding: 10px 14px; vertical-align: middle; }
+
+  tr.row-not-started { background: var(--them-soft); }
+  tr.row-in-progress { background: var(--warn-soft); }
+  tr.row-done        { background: var(--done-soft); }
+  tr.row-flagged {
+    background: #fff3e0 !important;
+    outline: 2px solid #e65100;
+    outline-offset: -2px;
+  }
+  tr.row-flagged td:first-child { padding-left: 14px; }
+
+  .flag-btn {
+    background: none; border: none; cursor: pointer;
+    font-size: 15px; padding: 2px 4px; border-radius: 4px;
+    line-height: 1; transition: all 0.15s; opacity: 0.3;
+  }
+  .flag-btn:hover { opacity: 1; transform: scale(1.2); }
+  .flag-btn.flagged { opacity: 1; }
+
+  .task-input, .notes-input, .date-input {
+    background: transparent; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    color: var(--ink); width: 100%;
+    padding: 3px 0;
+  }
+  .task-input { font-weight: 500; }
+  .task-input::placeholder, .notes-input::placeholder, .date-input::placeholder { color: #bbb; }
+
+  .owner-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 11px; font-weight: 600;
+    cursor: pointer; border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.15s;
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none;
+  }
+  .owner-us { background: var(--us-soft); color: var(--us); }
+  .owner-them { background: var(--them-soft); color: var(--them); }
+  .owner-both { background: #f3eeff; color: #6b3fa0; }
+  .owner-partner { background: #fce8f3; color: #a0306a; }
+  .owner-us:hover { background: var(--us); color: white; }
+  .owner-them:hover { background: var(--them); color: white; }
+  .owner-both:hover { background: #6b3fa0; color: white; }
+  .owner-partner:hover { background: #a0306a; color: white; }
+
+  .status-select {
+    background: transparent; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 12px;
+    font-weight: 500; cursor: pointer;
+    padding: 3px 6px; border-radius: 4px;
+    -webkit-appearance: none;
+  }
+  .status-not-started { color: var(--them); background: var(--them-soft); }
+  .status-in-progress { color: var(--warn); background: var(--warn-soft); }
+  .status-done { color: var(--done); background: var(--done-soft); }
+
+  .delete-btn {
+    background: none; border: none; cursor: pointer;
+    color: #ccc; font-size: 16px; padding: 2px 6px;
+    border-radius: 4px; transition: all 0.15s;
+    line-height: 1;
+  }
+  .delete-btn:hover { color: var(--accent); background: var(--accent-soft); }
+
+  .add-row-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 20px; background: none; border: none;
+    color: var(--done); font-family: 'DM Sans', sans-serif;
+    font-size: 13px; cursor: pointer;
+    width: 100%; text-align: left;
+    border-top: 1px solid var(--cream);
+    transition: all 0.15s;
+  }
+  .add-row-btn:hover { color: var(--accent); background: var(--accent-soft); }
+
+  .drag-handle {
+    cursor: grab; color: #ccc; font-size: 16px; padding: 0 4px;
+    user-select: none; line-height: 1;
+  }
+  .drag-handle:active { cursor: grabbing; }
+  tr.drag-over { outline: 2px dashed var(--accent); outline-offset: -2px; }
+  tr.dragging { opacity: 0.4; }
+  .row-actions { display: flex; align-items: center; gap: 2px; }
+  .move-btn {
+    background: none; border: none; cursor: pointer;
+    color: #ccc; font-size: 12px; padding: 1px 4px;
+    border-radius: 3px; line-height: 1; transition: all 0.12s;
+  }
+  .move-btn:hover { color: var(--ink); background: var(--cream); }
+
+  .date-overdue { color: var(--accent); font-weight: 600; }
+  .date-upcoming { color: var(--warn); }
+
+  .verified-check {
+    width: 17px; height: 17px; cursor: pointer;
+    accent-color: var(--us);
+  }
+
+  /* ── NOTES TOOLTIP ── */
+  .notes-cell { position: relative; }
+  .notes-input { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+  .task-input  { text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
+  .notes-textarea {
+    background: transparent; border: none; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 13.5px;
+    color: var(--ink); width: 100%;
+    padding: 3px 0; resize: none; overflow: hidden;
+    white-space: pre-wrap; word-break: break-word;
+    line-height: 1.45; min-height: 22px;
+    display: block;
+  }
+  .notes-textarea::placeholder { color: #bbb; }
+
+  #floatTooltip {
+    position: fixed;
+    min-width: 220px;
+    max-width: 320px;
+    background: #5a5a5a;
+    color: #f5f2ed;
+    font-size: 12.5px;
+    line-height: 1.5;
+    padding: 10px 13px;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(15,14,13,0.22);
+    z-index: 9999;
+    pointer-events: none;
+    white-space: pre-wrap;
+    word-break: break-word;
+    display: none;
+  }
+  #floatTooltip::after {
+    content: '';
+    position: absolute;
+    border: 6px solid transparent;
+  }
+  #floatTooltip.tip-above::after {
+    top: 100%; left: 16px;
+    border-top-color: #5a5a5a;
+  }
+  #floatTooltip.tip-below::after {
+    bottom: 100%; left: 16px;
+    border-bottom-color: #5a5a5a;
+  }
+
+  /* ── DATE PICKER CALENDAR ── */
+  .date-cell { position: relative; }
+  #datePicker {
+    position: fixed;
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    box-shadow: 0 8px 32px rgba(15,14,13,0.18);
+    z-index: 1000;
+    width: 240px;
+    padding: 12px;
+    display: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  #datePicker.open { display: block; }
+  .dp-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .dp-nav {
+    background: none; border: none; cursor: pointer;
+    font-size: 16px; padding: 2px 8px; border-radius: 5px;
+    color: var(--ink); line-height: 1; transition: background 0.12s;
+  }
+  .dp-nav:hover { background: var(--cream); }
+  .dp-month-label {
+    font-size: 13px; font-weight: 600; color: var(--ink);
+  }
+  .dp-grid {
+    display: grid; grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+  .dp-dow {
+    text-align: center; font-size: 10px; font-weight: 600;
+    color: var(--done); text-transform: uppercase;
+    padding: 3px 0; letter-spacing: 0.05em;
+  }
+  .dp-day {
+    text-align: center; font-size: 12px; padding: 5px 2px;
+    border-radius: 5px; cursor: pointer; color: var(--ink);
+    transition: background 0.1s;
+  }
+  .dp-day:hover { background: var(--cream); }
+  .dp-day.today { font-weight: 700; color: var(--accent); }
+  .dp-day.selected { background: var(--ink); color: white; border-radius: 5px; }
+  .dp-day.other-month { color: #ccc; }
+  .dp-day.empty { cursor: default; }
+  .dp-footer {
+    display: flex; justify-content: space-between;
+    margin-top: 10px; padding-top: 8px;
+    border-top: 1px solid var(--cream);
+    gap: 8px;
+  }
+  .dp-foot-btn {
+    flex: 1; padding: 5px 0; border-radius: 6px; border: 1px solid var(--rule);
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+    cursor: pointer; background: white; color: var(--ink);
+    transition: all 0.12s;
+  }
+  .dp-foot-btn:hover { background: var(--cream); }
+  .dp-foot-today { background: var(--ink); color: white; border-color: var(--ink); }
+  .dp-foot-today:hover { background: #2a2927; }
+
+  /* ── PRINT ── */
+  @media print {
+    .page-header, .header-actions, .add-row-btn, .delete-btn,
+    .btn { display: none !important; }
+    body { background: white; }
+    .deal-card, .progress-section, .table-section {
+      box-shadow: none; border-color: #ddd;
+      break-inside: avoid;
+    }
+    .container { padding: 0; max-width: 100%; }
+    .deal-title-input, .task-input, .notes-input, .date-input {
+      pointer-events: none;
+    }
+  }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(15,14,13,0.5); z-index: 200;
+    align-items: center; justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 14px;
+    padding: 32px; max-width: 460px; width: 92%;
+    box-shadow: var(--shadow-lg);
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: none; }
+  }
+  .modal h3 {
+    font-family: 'DM Serif Display', serif; font-size: 20px;
+    margin-bottom: 8px;
+  }
+  .modal p { color: var(--done); font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+  .modal textarea {
+    width: 100%; min-height: 120px; padding: 10px 14px;
+    border: 1px solid var(--rule); border-radius: 8px;
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    resize: vertical; outline: none; background: var(--paper);
+    color: var(--ink);
+  }
+  .modal textarea:focus { border-color: var(--accent); }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--ink); color: white;
+    padding: 10px 18px; border-radius: 8px;
+    font-size: 13px; font-weight: 500;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 300;
+  }
+  .toast.show { opacity: 1; }
+
+  /* ── EMPTY STATE ── */
+  .empty-row td {
+    text-align: center; padding: 32px;
+    color: var(--done); font-size: 13px;
+    font-style: italic;
+  }
+
+  @media (max-width: 700px) {
+    .deal-card-grid { grid-template-columns: 1fr 1fr; }
+    .progress-stats { display: none; }
+    .container { padding: 20px 14px 60px; }
+    .page-header { padding: 0 16px; }
+    .page-header .logo { font-size: 14px; }
+    .header-actions { gap: 6px; }
+    .btn { padding: 5px 10px; font-size: 12px; }
+  }
+
+  /* ── VIEW TOGGLE ── */
+  .view-toggle {
+    display: flex; gap: 4px; align-items: center;
+    background: var(--cream); border-radius: 7px; padding: 3px;
+  }
+  .view-btn {
+    padding: 5px 12px; border-radius: 5px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: none; background: transparent;
+    color: var(--done); transition: all 0.15s; font-family: 'DM Sans', sans-serif;
+  }
+  .view-btn.active { background: white; color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+  /* ── GANTT ── */
+  #ganttPanel { display: none; }
+  #ganttPanel.visible { display: block; }
+  .gantt-wrap {
+    background: white; border: 1px solid var(--rule); border-radius: 12px;
+    box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px;
+  }
+  .gantt-header {
+    padding: 16px 20px; border-bottom: 1px solid var(--cream);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .gantt-header h2 { font-family: 'DM Serif Display', serif; font-size: 16px; font-weight: 400; }
+  .gantt-scroll { overflow-x: auto; }
+  .gantt-inner { min-width: 700px; }
+  .gantt-row {
+    display: grid; align-items: center;
+    border-bottom: 1px solid var(--cream);
+    min-height: 38px;
+  }
+  .gantt-row:last-child { border-bottom: none; }
+  .gantt-label-col {
+    padding: 6px 14px; font-size: 12.5px; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    border-right: 1px solid var(--cream);
+  }
+  .gantt-bar-col { position: relative; height: 38px; }
+  .gantt-bar {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    height: 20px; border-radius: 4px; min-width: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600; color: white;
+    overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    padding: 0 6px; transition: opacity 0.15s;
+    cursor: default;
+  }
+  .gantt-bar:hover { opacity: 0.85; }
+  .gantt-bar-not-started { background: var(--them); }
+  .gantt-bar-in-progress  { background: var(--warn); }
+  .gantt-bar-done         { background: var(--done); }
+  .gantt-today-line {
+    position: absolute; top: 0; bottom: 0; width: 2px;
+    background: var(--accent); opacity: 0.7; z-index: 2;
+  }
+  .gantt-week-col {
+    padding: 6px 8px; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--done); background: var(--paper);
+    border-right: 1px solid var(--cream); text-align: center;
+    border-bottom: 1px solid var(--rule);
+  }
+  .gantt-no-date {
+    padding: 24px; text-align: center; color: var(--done);
+    font-size: 13px; font-style: italic;
+  }
+
+  /* ── IMPORT EXCEL MODAL ── */
+  #importModal .modal { max-width: 480px; }
+  .drop-zone {
+    border: 2px dashed var(--rule); border-radius: 10px;
+    padding: 32px 20px; text-align: center; cursor: pointer;
+    transition: all 0.15s; background: var(--paper);
+    margin-bottom: 14px;
+  }
+  .drop-zone:hover, .drop-zone.drag-active {
+    border-color: var(--accent); background: var(--accent-soft);
+  }
+  .drop-zone-icon { font-size: 28px; margin-bottom: 8px; }
+  .drop-zone-text { font-size: 13px; color: var(--done); }
+  .drop-zone-text strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="logo">NetBrain &amp; <span id="headerOrgName">Organization</span> Mutual Action Plan</div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="openImportModal()">⬆ Import Excel</button>
+    <button class="btn btn-ghost" onclick="openShareModal()">⬆ Export JSON</button>
+    <button class="btn btn-ghost" onclick="exportExcel()">⬇ Export Excel</button>
+    <button class="btn btn-ghost" onclick="exportJpeg()">⬇ Export JPEG</button>
+    <button class="btn btn-ghost" onclick="window.print()">⎙ Print / PDF</button>
+    <button class="btn btn-accent" onclick="addTask()">+ Add Task</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Deal Header -->
+  <div class="deal-card">
+    <input class="deal-title-input" id="dealTitle" type="text" value="Untitled Deal" oninput="save()" />
+    <div class="deal-card-grid">
+      <div class="field-group">
+        <label>Organization</label>
+        <input id="customer" type="text" placeholder="Acme Corp" oninput="save();render();updateApproverHeader();updateOrgOwnerLabel()" />
+      </div>
+      <div class="field-group">
+        <label id="orgOwnerLabel">Organization Owner</label>
+        <input id="orgOwner" type="text" placeholder="Owner name" oninput="save()" />
+      </div>
+      <div class="field-group">
+        <label>NetBrain Owner</label>
+        <input id="owner" type="text" placeholder="Your name" oninput="save()" />
+      </div>
+      <div class="field-group">
+        <label>Partner</label>
+        <input id="partner" type="text" placeholder="Partner name" oninput="save();updatePartnerOption()" />
+      </div>
+      <div class="field-group">
+        <label>Target Close Date</label>
+        <input id="closeDate" type="date" style="font-weight:600" oninput="save();colorEstCloseDate()" />
+      </div>
+      <div class="field-group">
+        <label>Est. Close Date</label>
+        <div id="estCloseDateWrapper" style="position:relative">
+          <input id="estCloseDate" type="date" oninput="save();colorEstCloseDate()" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-section">
+    <div>
+      <div class="progress-label">Overall Progress</div>
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div class="progress-pct" id="progressPct">0%</div>
+    <div class="progress-stats">
+      <div class="stat">
+        <span class="stat-n" id="statTotal">0</span>
+        <span class="stat-l">Total</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" id="statDone">0</span>
+        <span class="stat-l">Completed</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" id="statOverdue">0</span>
+        <span class="stat-l">Overdue</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- View Toggle + Tasks Table -->
+  <div class="table-section">
+    <div class="table-header">
+      <h2 id="tableTitle">Action Plan</h2>
+      <div style="display:flex;gap:10px;align-items:center">
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewListBtn" onclick="switchView('list')">☰ List</button>
+          <button class="view-btn" id="viewGanttBtn" onclick="switchView('gantt')">▦ Gantt</button>
+        </div>
+      </div>
+    </div>
+    <div class="table-scroll-wrap">
+    <table id="listTable">
+      <thead>
+        <tr>
+          <th style="width:22%">Task</th>
+          <th style="width:6%">Owner</th>
+          <th style="width:5%;text-align:center">Dependency</th>
+          <th style="width:7%">Start Date</th>
+          <th style="width:6%">Duration (Days)</th>
+          <th style="width:7%">End Date</th>
+          <th style="width:7%">Status</th>
+          <th style="width:7%">Approver(s) NetBrain</th>
+          <th style="width:7%" id="approverCustomerHeader">Approver(s) Customer</th>
+          <th style="width:5%;text-align:center">Verified</th>
+          <th style="width:15%">Next Steps - Notes</th>
+          <th style="width:36px"></th>
+        </tr>
+      </thead>
+      <tbody id="taskBody"></tbody>
+    </table>
+    <button class="add-row-btn" onclick="addTask()">
+      <span style="font-size:16px">+</span> Add Task
+    </button>
+    </div>
+  </div>
+
+  <!-- Gantt Panel -->
+  <div id="ganttPanel">
+    <div class="gantt-wrap">
+      <div class="gantt-header">
+        <h2>Timeline View</h2>
+        <span style="font-size:12px;color:var(--done)">Tasks with start date &amp; duration shown</span>
+      </div>
+      <div id="ganttContent"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Import Excel Modal -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal">
+    <h3>Import from Excel</h3>
+    <p>Upload a previously exported MAP Excel file. Tasks will be added to your current plan (or replace it).</p>
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('excelFileInput').click()"
+         ondragover="dropZoneDragOver(event)" ondragleave="dropZoneDragLeave(event)" ondrop="dropZoneDrop(event)">
+      <div class="drop-zone-icon">📂</div>
+      <div class="drop-zone-text"><strong>Click to browse</strong> or drag &amp; drop an Excel file</div>
+      <div style="font-size:11px;color:#aaa;margin-top:6px">.xlsx files only</div>
+    </div>
+    <input type="file" id="excelFileInput" accept=".xlsx" style="display:none" onchange="handleExcelFile(this.files[0])" />
+    <div id="importPreview" style="display:none;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--done);margin-bottom:6px">Preview (<span id="importCount">0</span> tasks found):</div>
+      <div id="importPreviewList" style="max-height:160px;overflow-y:auto;font-size:12px;border:1px solid var(--rule);border-radius:6px;padding:8px;background:var(--paper)"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="closeImportModal()">Cancel</button>
+      <button class="btn btn-primary btn-sm" id="importConfirmBtn" style="display:none" onclick="confirmImport()">Import Tasks</button>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="shareModal">
+  <div class="modal">
+    <h3>Export Plan</h3>
+    <p>Copy this JSON to save your plan or share it. Paste it back using "Import JSON" to restore.</p>
+    <textarea id="exportJson" readonly></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-ghost btn-sm" onclick="importJson()">Import JSON</button>
+      <button class="btn btn-primary btn-sm" onclick="copyJson()">Copy to Clipboard</button>
+      <button class="btn btn-ghost btn-sm" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="datePicker">
+  <div class="dp-header">
+    <button class="dp-nav" id="dpPrev">&#8249;</button>
+    <span class="dp-month-label" id="dpMonthLabel"></span>
+    <button class="dp-nav" id="dpNext">&#8250;</button>
+  </div>
+  <div class="dp-grid" id="dpGrid"></div>
+  <div class="dp-footer">
+    <button class="dp-foot-btn" id="dpClear">Clear</button>
+    <button class="dp-foot-btn dp-foot-today" id="dpToday">Today</button>
+  </div>
+</div>
+
+<div id="floatTooltip"></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── STATE ──
+  const STORE_KEY = 'map_v2';
+  let tasks = [];
+  let pendingImportTasks = [];
+  let currentView = 'list';
+
+  // ── INIT ──
+  function init() {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) {
+      try {
+        const d = JSON.parse(raw);
+        document.getElementById('dealTitle').value = d.dealTitle || 'Untitled Deal';
+        document.getElementById('customer').value = d.customer || '';
+        document.getElementById('orgOwner').value = d.orgOwner || '';
+        document.getElementById('owner').value = d.owner || '';
+        document.getElementById('partner').value = d.partner || '';
+        document.getElementById('closeDate').value = d.closeDate || '';
+        document.getElementById('estCloseDate').value = d.estCloseDate || '';
+        tasks = d.tasks || [];
+      } catch(e) { tasks = []; }
+    } else {
+      // Default 10 blank tasks with today's start date
+      const today = fmtDate(0);
+      tasks = Array.from({ length: 10 }, () => ({
+        id: uid(), task: '', owner: 'netbrain', dependency: false, start: today,
+        duration: '', due: '', status: 'not-started', verified: false, approverNB: '', approverCust: '', notes: ''
+      }));
+    }
+    updateOrgOwnerLabel();
+    updatePartnerOption();
+    render();
+    colorEstCloseDate();
+  }
+
+  function fmtDate(daysFromNow) {
+    const d = new Date(); d.setDate(d.getDate() + daysFromNow);
+    return d.toISOString().slice(0,10);
+  }
+  function uid() { return Math.random().toString(36).slice(2,10); }
+
+  // ── SAVE ──
+  function save() {
+    const data = {
+      dealTitle: document.getElementById('dealTitle').value,
+      customer: document.getElementById('customer').value,
+      orgOwner: document.getElementById('orgOwner').value,
+      owner: document.getElementById('owner').value,
+      partner: document.getElementById('partner').value,
+      closeDate: document.getElementById('closeDate').value,
+      estCloseDate: document.getElementById('estCloseDate').value,
+      tasks
+    };
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    updateProgress();
+    syncEstCloseDate();
+  }
+
+  function updateOrgOwnerLabel() {
+    const name = document.getElementById('customer').value.trim() || 'Organization';
+    document.getElementById('orgOwnerLabel').textContent = name + ' Owner';
+    document.getElementById('headerOrgName').textContent = name;
+  }
+
+  function updatePartnerOption() {
+    const partnerName = document.getElementById('partner').value.trim() || 'Partner';
+    document.querySelectorAll('.owner-badge option[value="partner"]').forEach(opt => {
+      opt.textContent = '● ' + partnerName;
+    });
+  }
+
+  function updateApproverHeader() {
+    const customerName = document.getElementById('customer').value.trim() || 'Customer';
+    const hdr = document.getElementById('approverCustomerHeader');
+    if (hdr) hdr.textContent = 'Approver(s) ' + customerName;
+  }
+
+  // ── SYNC EST. CLOSE DATE ──
+  function syncEstCloseDate() {
+    for (let i = tasks.length - 1; i >= 0; i--) {
+      const endDate = calcEndDate(tasks[i].start, tasks[i].duration);
+      if (endDate) {
+        const el = document.getElementById('estCloseDate');
+        if (!el._userEdited) el.value = endDate;
+        break;
+      }
+    }
+    colorEstCloseDate();
+  }
+
+  function colorEstCloseDate() {
+    const estEl = document.getElementById('estCloseDate');
+    const wrapper = document.getElementById('estCloseDateWrapper');
+    const target = document.getElementById('closeDate').value;
+    const est = estEl.value;
+    if (est && target) {
+      const onTime = est <= target;
+      wrapper.style.borderRadius = '6px';
+      wrapper.style.padding = '2px';
+      wrapper.style.background = onTime ? '#d4edda' : '#f8d7da';
+      wrapper.style.border = `2px solid ${onTime ? '#2d6a4f' : '#c84b2f'}`;
+      estEl.style.background = 'transparent';
+      estEl.style.border = 'none';
+      estEl.style.fontWeight = '600';
+      estEl.style.color = onTime ? '#2d6a4f' : '#c84b2f';
+    } else {
+      wrapper.style.background = '';
+      wrapper.style.border = '';
+      wrapper.style.padding = '';
+      estEl.style.background = '';
+      estEl.style.border = '';
+      estEl.style.fontWeight = '';
+      estEl.style.color = '';
+    }
+  }
+
+  // ── VIEW TOGGLE ──
+  function switchView(v) {
+    currentView = v;
+    document.getElementById('viewListBtn').classList.toggle('active', v === 'list');
+    document.getElementById('viewGanttBtn').classList.toggle('active', v === 'gantt');
+    document.getElementById('listTable').style.display = v === 'list' ? '' : 'none';
+    document.querySelector('.add-row-btn').style.display = v === 'list' ? '' : 'none';
+    document.getElementById('ganttPanel').classList.toggle('visible', v === 'gantt');
+    document.getElementById('tableTitle').textContent = v === 'list' ? 'Action Items' : 'Action Items';
+    if (v === 'gantt') renderGantt();
+  }
+
+  // ── RENDER ──
+  function render() {
+    applyDependencies();
+    const tbody = document.getElementById('taskBody');
+    if (tasks.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="12">No action items yet — click "+ Add action item" to get started.</td></tr>`;
+    } else {
+      tbody.innerHTML = tasks.map(t => taskRow(t)).join('');
+    }
+    updateProgress();
+    syncEstCloseDate();
+    updateApproverHeader();
+    if (currentView === 'gantt') renderGantt();
+    setTimeout(() => document.querySelectorAll('.notes-textarea').forEach(autoResize), 0);
+  }
+
+  // ── GANTT ──
+  function renderGantt() {
+    const el = document.getElementById('ganttContent');
+    const datable = tasks.filter(t => t.start && t.duration);
+    if (!datable.length) {
+      el.innerHTML = `<div class="gantt-no-date">No tasks have both a start date and duration set. Add those fields to see the timeline.</div>`;
+      return;
+    }
+    // Compute date range
+    let minDate = datable.reduce((m, t) => t.start < m ? t.start : m, datable[0].start);
+    let maxEndDate = datable.reduce((m, t) => { const e = calcEndDate(t.start, t.duration); return e > m ? e : m; }, calcEndDate(datable[0].start, datable[0].duration));
+    const start = new Date(minDate);
+    const end = new Date(maxEndDate);
+    // pad by 5 days each side
+    start.setDate(start.getDate() - 3);
+    end.setDate(end.getDate() + 3);
+    const totalDays = Math.max(1, Math.round((end - start) / 86400000));
+    const LABEL_W = 200;
+    const today = new Date().toISOString().slice(0,10);
+    const todayPct = Math.max(0, Math.min(100, ((new Date(today) - start) / (end - start)) * 100));
+
+    // Build week labels
+    const weekLabels = [];
+    let cur = new Date(start);
+    while (cur <= end) {
+      const label = cur.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+      const pct = ((cur - start) / (end - start)) * 100;
+      weekLabels.push({ label, pct });
+      cur.setDate(cur.getDate() + 7);
+    }
+
+    const barColorClass = { 'not-started': 'gantt-bar-not-started', 'in-progress': 'gantt-bar-in-progress', 'done': 'gantt-bar-done' };
+
+    const headerCols = `<div style="display:grid;grid-template-columns:${LABEL_W}px 1fr;border-bottom:1px solid var(--rule)">
+      <div style="border-right:1px solid var(--cream)"></div>
+      <div style="position:relative;height:32px;overflow:hidden">
+        ${weekLabels.map(w => `<div class="gantt-week-col" style="position:absolute;left:${w.pct}%;transform:translateX(-50%);white-space:nowrap">${w.label}</div>`).join('')}
+      </div>
+    </div>`;
+
+    const rows = datable.map(t => {
+      const tStart = new Date(t.start);
+      const tEnd = new Date(calcEndDate(t.start, t.duration));
+      const leftPct = ((tStart - start) / (end - start)) * 100;
+      const widthPct = ((tEnd - tStart) / (end - start)) * 100;
+      const cls = barColorClass[t.status] || 'gantt-bar-not-started';
+      return `<div class="gantt-row" style="grid-template-columns:${LABEL_W}px 1fr">
+        <div class="gantt-label-col" title="${esc(t.task)}">${esc(t.task) || '<em style="color:#aaa">Untitled</em>'}</div>
+        <div class="gantt-bar-col">
+          <div class="gantt-today-line" style="left:${todayPct}%" title="Today"></div>
+          <div class="gantt-bar ${cls}" style="left:${leftPct}%;width:${widthPct}%" title="${t.start} → ${calcEndDate(t.start,t.duration)} (${t.duration}d)">${t.duration}d</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    el.innerHTML = `<div class="gantt-scroll"><div class="gantt-inner">${headerCols}${rows}</div></div>`;
+  }
+
+  function calcEndDate(start, duration) {
+    if (!start || !duration || isNaN(parseInt(duration))) return '';
+    const d = new Date(start);
+    d.setDate(d.getDate() + parseInt(duration));
+    return d.toISOString().slice(0, 10);
+  }
+
+  function taskRow(t) {
+    const today = new Date().toISOString().slice(0,10);
+    const endDate = calcEndDate(t.start, t.duration);
+    // Store computed end date back onto task for progress/overdue use
+    t.due = endDate || t.due;
+    let dateClass = '';
+    if (endDate && t.status !== 'done') {
+      if (endDate < today) dateClass = 'date-overdue';
+      else if (endDate <= fmtDate(7)) dateClass = 'date-upcoming';
+    }
+    const statusClass = { 'not-started': 'status-not-started', 'in-progress': 'status-in-progress', 'done': 'status-done' }[t.status] || 'status-not-started';
+    const rowClass = [
+      { 'not-started': 'row-not-started', 'in-progress': 'row-in-progress', 'done': 'row-done' }[t.status] || '',
+      t.flagged ? 'row-flagged' : ''
+    ].filter(Boolean).join(' ');
+    const ownerMap = { 'netbrain': 'owner-us', 'customer': 'owner-them', 'both': 'owner-both', 'partner': 'owner-partner' };
+    const ownerClass = ownerMap[t.owner] || 'owner-us';
+    const customerName = document.getElementById('customer').value.trim() || 'Customer';
+    const partnerName  = document.getElementById('partner').value.trim() || 'Partner';
+
+    return `<tr class="${rowClass}" draggable="true" data-id="${t.id}"
+        ondragstart="dragStart(event,'${t.id}')"
+        ondragover="dragOver(event)"
+        ondragleave="dragLeave(event)"
+        ondrop="dragDrop(event,'${t.id}')"
+        ondragend="dragEnd(event)">
+      <td class="notes-cell task-cell" data-tip="${esc(t.task)}"><textarea class="notes-textarea" style="font-weight:500" placeholder="Describe task…" oninput="updateField('${t.id}','task',this.value);this.closest('.notes-cell').dataset.tip=this.value||'';autoResize(this)">${esc(t.task)}</textarea></td>
+      <td>
+        <select class="owner-badge ${ownerClass}" onchange="updateOwner('${t.id}',this)">
+          <option value="netbrain" ${t.owner==='netbrain'?'selected':''}>● NetBrain</option>
+          <option value="customer" ${t.owner==='customer'?'selected':''}>● ${esc(customerName)}</option>
+          <option value="partner" ${t.owner==='partner'?'selected':''}>● ${esc(partnerName)}</option>
+          <option value="both" ${t.owner==='both'?'selected':''}>● Both</option>
+        </select>
+      </td>
+      <td style="text-align:center">
+        <input type="checkbox" class="verified-check" ${t.dependency?'checked':''} onchange="updateField('${t.id}','dependency',this.checked)" />
+      </td>
+      <td class="date-cell" style="white-space:nowrap">
+        <input class="date-input" type="text" value="${t.start ? formatDateDisplay(t.start) : ''}" placeholder="e.g. 3/15/26" onblur="normalizeDateInput(this,'${t.id}')" onkeydown="if(event.key==='Enter'){this.blur()}" style="width:calc(100% - 22px)" />
+        <span style="cursor:pointer;opacity:0.4;font-size:13px;vertical-align:middle" onmousedown="openDatePicker(event,this.previousElementSibling,'${t.id}')" title="Pick a date">📅</span>
+      </td>
+      <td><input class="task-input" type="number" min="0" value="${t.duration||''}" placeholder="—" style="text-align:center;font-weight:400" oninput="updateDateField('${t.id}','duration',this.value)" /></td>
+      <td><span class="date-input ${dateClass}" style="display:block;padding:3px 0;font-size:13.5px">${endDate || '—'}</span></td>
+      <td>
+        <select class="status-select ${statusClass}" onchange="updateStatus('${t.id}',this)">
+          <option value="not-started" ${t.status==='not-started'?'selected':''}>Not Started</option>
+          <option value="in-progress" ${t.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="done" ${t.status==='done'?'selected':''}>Completed</option>
+        </select>
+      </td>
+      <td class="notes-cell" data-tip="${esc(t.approverNB||'')}">
+        <input class="notes-input" value="${esc(t.approverNB||'')}" placeholder="Name(s)…" oninput="updateField('${t.id}','approverNB',this.value);this.closest('.notes-cell').dataset.tip=this.value||''" />
+      </td>
+      <td class="notes-cell" data-tip="${esc(t.approverCust||'')}">
+        <input class="notes-input" value="${esc(t.approverCust||'')}" placeholder="Name(s)…" oninput="updateField('${t.id}','approverCust',this.value);this.closest('.notes-cell').dataset.tip=this.value||''" />
+      </td>
+      <td style="text-align:center">
+        <input type="checkbox" class="verified-check" ${t.verified?'checked':''} onchange="updateField('${t.id}','verified',this.checked)" />
+      </td>
+      <td class="notes-cell" data-tip="${esc(t.notes||'')}">
+        <textarea class="notes-textarea" placeholder="Notes…" oninput="updateField('${t.id}','notes',this.value);this.closest('.notes-cell').dataset.tip=this.value||'';autoResize(this)">${esc(t.notes||'')}</textarea>
+      </td>
+      <td>
+        <div class="row-actions">
+          <button class="flag-btn ${t.flagged ? 'flagged' : ''}" onclick="toggleFlag('${t.id}')" title="${t.flagged ? 'Remove flag' : 'Flag as critical'}">🚩</button>
+          <span class="drag-handle" title="Drag to reorder">⠿</span>
+          <button class="delete-btn" onclick="deleteTask('${t.id}')" title="Remove">×</button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+  // ── IMPORT EXCEL ──
+  function openImportModal() {
+    document.getElementById('importModal').classList.add('open');
+    document.getElementById('importPreview').style.display = 'none';
+    document.getElementById('importConfirmBtn').style.display = 'none';
+    document.getElementById('excelFileInput').value = '';
+    pendingImportTasks = [];
+  }
+
+  function closeImportModal() {
+    document.getElementById('importModal').classList.remove('open');
+  }
+
+  function dropZoneDragOver(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.add('drag-active');
+  }
+
+  function dropZoneDragLeave(e) {
+    document.getElementById('dropZone').classList.remove('drag-active');
+  }
+
+  function dropZoneDrop(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').classList.remove('drag-active');
+    const file = e.dataTransfer.files[0];
+    if (file) handleExcelFile(file);
+  }
+
+  function handleExcelFile(file) {
+    if (!file || !file.name.endsWith('.xlsx')) { toast('Please select a .xlsx file'); return; }
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const wb = XLSX.read(e.target.result, { type: 'binary' });
+        const ws = wb.Sheets['Action Items'] || wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+        if (!rows.length) { toast('No rows found in sheet'); return; }
+
+        const ownerRevMap = {};
+        // detect customer name from Deal Info sheet
+        let custName = '';
+        if (wb.Sheets['Deal Info']) {
+          const info = XLSX.utils.sheet_to_json(wb.Sheets['Deal Info'], { header: 1 });
+          const orgRow = info.find(r => r[0] === 'Organization');
+          if (orgRow) custName = orgRow[1] || '';
+        }
+
+        pendingImportTasks = rows.map(row => ({
+          id: uid(),
+          task: row['Task'] || '',
+          owner: row['Owner'] === 'NetBrain' ? 'netbrain' : row['Owner'] === 'Both' ? 'both' : 'customer',
+          dependency: false,
+          start: row['Start Date'] || '',
+          duration: row['Duration (Days)'] !== '' ? String(row['Duration (Days)']) : '',
+          due: row['End Date'] || '',
+          status: row['Status'] === 'Completed' ? 'done' : row['Status'] === 'In Progress' ? 'in-progress' : 'not-started',
+          approverNB: row['Approver(s) NetBrain'] || '',
+          approverCust: row[Object.keys(row).find(k => k.startsWith('Approver(s)') && k !== 'Approver(s) NetBrain') || ''] || '',
+          verified: row['Verified'] === 'Yes',
+          notes: row['Next Steps - Notes'] || row['Notes'] || '',
+        }));
+
+        const preview = document.getElementById('importPreviewList');
+        preview.innerHTML = pendingImportTasks.slice(0, 8).map(t =>
+          `<div style="padding:3px 0;border-bottom:1px solid var(--cream)">${t.task || '<em>Untitled</em>'} <span style="color:var(--done);font-size:11px">(${t.status.replace('-',' ')})</span></div>`
+        ).join('') + (pendingImportTasks.length > 8 ? `<div style="padding:4px 0;color:var(--done)">…and ${pendingImportTasks.length - 8} more</div>` : '');
+        document.getElementById('importCount').textContent = pendingImportTasks.length;
+        document.getElementById('importPreview').style.display = 'block';
+        document.getElementById('importConfirmBtn').style.display = '';
+      } catch(err) { toast('Could not parse Excel file: ' + err.message); }
+    };
+    reader.readAsBinaryString(file);
+  }
+
+  function confirmImport() {
+    if (!pendingImportTasks.length) return;
+    const replace = confirm(`Import ${pendingImportTasks.length} tasks?\n\nOK = Replace all current tasks\nCancel = Append to existing tasks`);
+    if (replace) {
+      tasks = pendingImportTasks;
+    } else {
+      tasks = [...tasks, ...pendingImportTasks];
+    }
+    closeImportModal();
+    save(); render();
+    toast(`Imported ${pendingImportTasks.length} tasks!`);
+    pendingImportTasks = [];
+  }
+
+  function updateDateField(id, field, val) {
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+    t[field] = val;
+    save();
+    applyDependencies();
+    tasks.forEach(task => updateEndDateCell(task));
+    updateProgress();
+    syncEstCloseDate();
+  }
+
+  // ── DEPENDENCY LOGIC ──
+  function applyDependencies() {
+    for (let i = 1; i < tasks.length; i++) {
+      if (tasks[i].dependency) {
+        const prevEnd = calcEndDate(tasks[i-1].start, tasks[i-1].duration);
+        if (prevEnd) tasks[i].start = prevEnd;
+      }
+    }
+  }
+
+  function moveTask(id, dir) {
+    const idx = tasks.findIndex(t => t.id === id);
+    const newIdx = idx + dir;
+    if (newIdx < 0 || newIdx >= tasks.length) return;
+    const tmp = tasks[idx]; tasks[idx] = tasks[newIdx]; tasks[newIdx] = tmp;
+    save(); render();
+  }
+
+  // ── DRAG AND DROP ──
+  let dragId = null;
+
+  function dragStart(e, id) {
+    dragId = id;
+    e.currentTarget.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+  }
+
+  function dragOver(e) {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    e.currentTarget.classList.add('drag-over');
+  }
+
+  function dragLeave(e) {
+    e.currentTarget.classList.remove('drag-over');
+  }
+
+  function dragDrop(e, targetId) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (!dragId || dragId === targetId) return;
+    const fromIdx = tasks.findIndex(t => t.id === dragId);
+    const toIdx   = tasks.findIndex(t => t.id === targetId);
+    const [moved] = tasks.splice(fromIdx, 1);
+    tasks.splice(toIdx, 0, moved);
+    save(); render();
+  }
+
+  function dragEnd(e) {
+    e.currentTarget.classList.remove('dragging');
+    document.querySelectorAll('tr.drag-over').forEach(r => r.classList.remove('drag-over'));
+    dragId = null;
+  }
+
+  // ── TASK OPS ──
+  function addTask() {
+    tasks.push({ id: uid(), task: '', owner: 'netbrain', dependency: false, start: '', duration: '', due: '', status: 'not-started', flagged: false, verified: false, approverNB: '', approverCust: '', notes: '' });
+    save(); render();
+    // Focus last row
+    setTimeout(() => {
+      const inputs = document.querySelectorAll('.task-input');
+      if (inputs.length) inputs[inputs.length-1].focus();
+    }, 50);
+  }
+
+  function toggleFlag(id) {
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+    t.flagged = !t.flagged;
+    save(); render();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    save(); render();
+  }
+
+  function updateField(id, field, val) {
+    const t = tasks.find(t => t.id === id);
+    if (t) { t[field] = val; save(); }
+    if (field === 'dependency') { applyDependencies(); render(); }
+  }
+
+  function updateStatus(id, sel) {
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+    t.status = sel.value;
+    sel.className = 'status-select ' + { 'not-started': 'status-not-started', 'in-progress': 'status-in-progress', 'done': 'status-done' }[t.status];
+    const row = sel.closest('tr');
+    row.classList.remove('row-not-started', 'row-in-progress', 'row-done');
+    const rowClass = { 'not-started': 'row-not-started', 'in-progress': 'row-in-progress', 'done': 'row-done' }[t.status];
+    if (rowClass) row.classList.add(rowClass);
+    save(); updateProgress();
+  }
+
+  function updateOwner(id, sel) {
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+    t.owner = sel.value;
+    const ownerMap = { 'netbrain': 'owner-us', 'customer': 'owner-them', 'both': 'owner-both', 'partner': 'owner-partner' };
+    sel.className = 'owner-badge ' + (ownerMap[sel.value] || 'owner-us');
+    save();
+  }
+
+  // ── PROGRESS ──
+  function updateProgress() {
+    const total = tasks.length;
+    const done = tasks.filter(t => t.status === 'done').length;
+    const today = new Date().toISOString().slice(0,10);
+    const overdue = tasks.filter(t => t.due && t.due < today && t.status !== 'done').length;
+    const pct = total ? Math.round((done/total)*100) : 0;
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statDone').textContent = done;
+    document.getElementById('statOverdue').textContent = overdue;
+    document.getElementById('statOverdue').style.color = overdue > 0 ? 'var(--accent)' : 'var(--ink)';
+  }
+
+  // ── SHARE / EXPORT ──
+  function openShareModal() {
+    const data = {
+      dealTitle: document.getElementById('dealTitle').value,
+      customer: document.getElementById('customer').value,
+      orgOwner: document.getElementById('orgOwner').value,
+      owner: document.getElementById('owner').value,
+      partner: document.getElementById('partner').value,
+      closeDate: document.getElementById('closeDate').value,
+      estCloseDate: document.getElementById('estCloseDate').value,
+      tasks
+    };
+    document.getElementById('exportJson').value = JSON.stringify(data, null, 2);
+    document.getElementById('shareModal').classList.add('open');
+  }
+
+  function closeModal() {
+    document.getElementById('shareModal').classList.remove('open');
+  }
+
+  function copyJson() {
+    const ta = document.getElementById('exportJson');
+    ta.select();
+    navigator.clipboard.writeText(ta.value).then(() => toast('Copied to clipboard!')).catch(() => { document.execCommand('copy'); toast('Copied!'); });
+  }
+
+  function importJson() {
+    const raw = prompt('Paste exported JSON here:');
+    if (!raw) return;
+    try {
+      const d = JSON.parse(raw);
+      localStorage.setItem(STORE_KEY, raw);
+      closeModal(); init();
+      toast('Plan imported!');
+    } catch(e) { toast('Invalid JSON — could not import.'); }
+  }
+
+  // ── EXPORT EXCEL ──
+  function exportExcel() {
+    const dealTitle = document.getElementById('dealTitle').value || 'Mutual Action Plan';
+    const customer  = document.getElementById('customer').value.trim() || 'Customer';
+
+    // ── Info sheet rows ──
+    const infoRows = [
+      ['Deal', dealTitle],
+      ['Organization', customer],
+      ['Organization Owner', document.getElementById('orgOwner').value],
+      ['NetBrain Owner', document.getElementById('owner').value],
+      ['Target Close Date', document.getElementById('closeDate').value],
+      ['Est. Close Date', document.getElementById('estCloseDate').value],
+      ['Exported', new Date().toLocaleDateString()],
+    ];
+
+    // ── Task rows ──
+    const headers = [
+      'Task', 'Owner', 'Start Date', 'Duration (Days)', 'End Date',
+      'Status', `Approver(s) NetBrain`, `Approver(s) ${customer}`,
+      'Verified', 'Notes'
+    ];
+
+    const partnerName = document.getElementById('partner').value.trim() || 'Partner';
+    const ownerLabel = { netbrain: 'NetBrain', customer, partner: partnerName, both: 'Both' };
+    const statusLabel = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'done': 'Completed' };
+
+    const taskRows = tasks.map(t => [
+      t.task,
+      ownerLabel[t.owner] || t.owner,
+      t.start || '',
+      t.duration !== '' && t.duration !== undefined ? Number(t.duration) : '',
+      calcEndDate(t.start, t.duration) || '',
+      statusLabel[t.status] || t.status,
+      t.approverNB  || '',
+      t.approverCust || '',
+      t.verified ? 'Yes' : 'No',
+      t.notes || '',
+    ]);
+
+    const wb = XLSX.utils.book_new();
+
+    // Tasks sheet
+    const wsData = [headers, ...taskRows];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+    // Column widths
+    ws['!cols'] = [
+      {wch:35},{wch:14},{wch:13},{wch:16},{wch:13},
+      {wch:14},{wch:22},{wch:22},{wch:10},{wch:35}
+    ];
+
+    // Style header row (bold + fill) — SheetJS CE supports basic cell styles via write options
+    headers.forEach((_, i) => {
+      const cellRef = XLSX.utils.encode_cell({r:0, c:i});
+      if (!ws[cellRef]) return;
+      ws[cellRef].s = {
+        font: { bold: true, color: { rgb: 'FFFFFF' } },
+        fill: { fgColor: { rgb: '0F0E0D' } },
+        alignment: { horizontal: 'center', wrapText: true }
+      };
+    });
+
+    // Colour-code status cells
+    const statusColors = { 'Not Started': 'DAEAF5', 'In Progress': 'FEF3C7', 'Completed': 'D4EDDA' };
+    taskRows.forEach((row, ri) => {
+      const status = row[5];
+      const color = statusColors[status];
+      if (!color) return;
+      headers.forEach((_, ci) => {
+        const cellRef = XLSX.utils.encode_cell({r: ri+1, c: ci});
+        if (!ws[cellRef]) ws[cellRef] = { t:'z' };
+        ws[cellRef].s = { fill: { fgColor: { rgb: color } } };
+      });
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, 'Action Items');
+
+    // Info sheet
+    const wsInfo = XLSX.utils.aoa_to_sheet(infoRows);
+    wsInfo['!cols'] = [{wch:20},{wch:30}];
+    XLSX.utils.book_append_sheet(wb, wsInfo, 'Deal Info');
+
+    const filename = `${dealTitle.replace(/[^a-z0-9]/gi,'_')}_MAP.xlsx`;
+    XLSX.writeFile(wb, filename, { bookType: 'xlsx', cellStyles: true });
+    toast('Excel file downloaded!');
+  }
+
+  // ── EXPORT JPEG ──
+  async function exportJpeg() {
+    const dealTitle = document.getElementById('dealTitle').value || 'Mutual Action Plan';
+    const target = document.querySelector('.container');
+    toast('Generating image…');
+    try {
+      // Temporarily hide interactive controls for a clean capture
+      const hideSel = '.page-header, .header-actions, .add-row-btn, .delete-btn, .drag-handle, .flag-btn, .move-btn, .view-toggle';
+      const hidden = [...document.querySelectorAll(hideSel)];
+      hidden.forEach(el => el.style.visibility = 'hidden');
+
+      const canvas = await html2canvas(target, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#f5f2ed',
+        scrollX: 0,
+        scrollY: -window.scrollY,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+      });
+
+      hidden.forEach(el => el.style.visibility = '');
+
+      const link = document.createElement('a');
+      link.download = `${dealTitle.replace(/[^a-z0-9]/gi,'_')}_MAP.jpg`;
+      link.href = canvas.toDataURL('image/jpeg', 0.92);
+      link.click();
+      toast('JPEG downloaded!');
+    } catch(err) {
+      toast('Export failed: ' + err.message);
+    }
+  }
+
+  // ── TOAST ──
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 2500);
+  }
+
+  // ── DATE PARSING ──
+  const MONTH_NAMES = {
+    jan:0,feb:1,mar:2,apr:3,may:4,jun:5,jul:6,aug:7,sep:8,oct:9,nov:10,dec:11,
+    january:0,february:1,march:2,april:3,june:5,july:6,august:7,september:8,october:9,november:10,december:11
+  };
+
+  function parseDate(str) {
+    if (!str || !str.trim()) return '';
+    str = str.trim();
+
+    // Already ISO format YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+
+    let m, d, y;
+    const currentYear = new Date().getFullYear();
+    const century = Math.floor(currentYear / 100) * 100;
+
+    // M/D/YY or M/D/YYYY or M-D-YY or M-D-YYYY
+    let match = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+    if (match) {
+      m = parseInt(match[1]); d = parseInt(match[2]); y = parseInt(match[3]);
+      if (y < 100) y = century + y;
+      return toISO(y, m, d);
+    }
+
+    // M/D (current year assumed)
+    match = str.match(/^(\d{1,2})[\/\-\.](\d{1,2})$/);
+    if (match) {
+      m = parseInt(match[1]); d = parseInt(match[2]); y = currentYear;
+      return toISO(y, m, d);
+    }
+
+    // "Mar 15 2026" or "March 15, 2026" or "15 Mar 2026"
+    match = str.match(/^([a-zA-Z]+)\s+(\d{1,2}),?\s*(\d{2,4})$/);
+    if (match) {
+      const mn = MONTH_NAMES[match[1].toLowerCase().slice(0,3)];
+      if (mn !== undefined) {
+        d = parseInt(match[2]); y = parseInt(match[3]);
+        if (y < 100) y = century + y;
+        return toISO(y, mn + 1, d);
+      }
+    }
+    match = str.match(/^(\d{1,2})\s+([a-zA-Z]+),?\s*(\d{2,4})$/);
+    if (match) {
+      const mn = MONTH_NAMES[match[2].toLowerCase().slice(0,3)];
+      if (mn !== undefined) {
+        d = parseInt(match[1]); y = parseInt(match[3]);
+        if (y < 100) y = century + y;
+        return toISO(y, mn + 1, d);
+      }
+    }
+
+    // "Mar 15" or "15 Mar" (current year)
+    match = str.match(/^([a-zA-Z]+)\s+(\d{1,2})$/);
+    if (match) {
+      const mn = MONTH_NAMES[match[1].toLowerCase().slice(0,3)];
+      if (mn !== undefined) return toISO(currentYear, mn + 1, parseInt(match[2]));
+    }
+    match = str.match(/^(\d{1,2})\s+([a-zA-Z]+)$/);
+    if (match) {
+      const mn = MONTH_NAMES[match[2].toLowerCase().slice(0,3)];
+      if (mn !== undefined) return toISO(currentYear, mn + 1, parseInt(match[1]));
+    }
+
+    return ''; // unparseable — leave blank
+  }
+
+  function toISO(y, m, d) {
+    if (!y || m < 1 || m > 12 || d < 1 || d > 31) return '';
+    return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  }
+
+  function formatDateDisplay(iso) {
+    // Show as M/D/YY for compact display
+    if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
+    const [y, m, d] = iso.split('-').map(Number);
+    return `${m}/${d}/${String(y).slice(2)}`;
+  }
+
+  function normalizeDateInput(input, id) {
+    const raw = input.value.trim();
+    const t = tasks.find(t => t.id === id);
+    if (!t) return;
+
+    if (!raw) {
+      input.style.color = '';
+      t.start = '';
+      save();
+      updateEndDateCell(t);
+      return;
+    }
+
+    const parsed = parseDate(raw);
+    if (parsed) {
+      input.value = formatDateDisplay(parsed);
+      input.style.color = '';
+      t.start = parsed;
+      save();
+      applyDependencies();
+      // Update all start inputs that changed due to dependencies (without full re-render)
+      tasks.forEach(task => {
+        const row = document.querySelector(`tr[data-id="${task.id}"]`);
+        if (!row) return;
+        const startInput = row.cells[3] && row.cells[3].querySelector('input');
+        if (startInput && document.activeElement !== startInput) {
+          startInput.value = task.start ? formatDateDisplay(task.start) : '';
+        }
+        updateEndDateCell(task);
+      });
+      updateProgress();
+      syncEstCloseDate();
+    } else {
+      input.style.color = 'var(--accent)'; // red = unparseable
+    }
+  }
+
+  function updateEndDateCell(t) {
+    const row = document.querySelector(`tr[data-id="${t.id}"]`);
+    if (!row) return;
+    const endSpan = row.querySelector('td:nth-child(6) span');
+    if (!endSpan) return;
+    const today = new Date().toISOString().slice(0,10);
+    const endDate = calcEndDate(t.start, t.duration);
+    t.due = endDate || t.due;
+    endSpan.textContent = endDate || '—';
+    endSpan.className = 'date-input';
+    if (endDate && t.status !== 'done') {
+      if (endDate < today) endSpan.classList.add('date-overdue');
+      else if (endDate <= fmtDate(7)) endSpan.classList.add('date-upcoming');
+    }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  }
+
+  // ── DATE PICKER ──
+  let dpTargetInput = null;
+  let dpTargetId    = null;
+  let dpYear  = 0;
+  let dpMonth = 0;
+  const dp = document.getElementById('datePicker');
+  const dpGrid = document.getElementById('dpGrid');
+  const dpLabel = document.getElementById('dpMonthLabel');
+  const MONTH_LABELS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DOW = ['Su','Mo','Tu','We','Th','Fr','Sa'];
+
+  function openDatePicker(e, input, id) {
+    e.preventDefault();
+    dpTargetInput = input;
+    dpTargetId    = id;
+    const t = tasks.find(t => t.id === id);
+    const now = new Date();
+    if (t && t.start) {
+      const d = new Date(t.start + 'T00:00:00');
+      dpYear  = d.getFullYear();
+      dpMonth = d.getMonth();
+    } else {
+      dpYear  = now.getFullYear();
+      dpMonth = now.getMonth();
+    }
+    renderCalendar();
+    positionPicker(input);
+    dp.classList.add('open');
+  }
+
+  function positionPicker(input) {
+    const rect = input.getBoundingClientRect();
+    let top  = rect.bottom + 6;
+    let left = rect.left;
+    dp.style.display = 'block';
+    const pw = dp.offsetWidth;
+    const ph = dp.offsetHeight;
+    if (left + pw > window.innerWidth - 8) left = window.innerWidth - pw - 8;
+    if (top + ph > window.innerHeight - 8) top = rect.top - ph - 6;
+    dp.style.top  = top  + 'px';
+    dp.style.left = left + 'px';
+  }
+
+  function renderCalendar() {
+    dpLabel.textContent = MONTH_LABELS[dpMonth] + ' ' + dpYear;
+    const today = new Date().toISOString().slice(0,10);
+    const selectedIso = dpTargetId ? (tasks.find(t => t.id === dpTargetId) || {}).start || '' : '';
+    const firstDay = new Date(dpYear, dpMonth, 1).getDay();
+    const daysInMonth = new Date(dpYear, dpMonth + 1, 0).getDate();
+
+    let html = DOW.map(d => `<div class="dp-dow">${d}</div>`).join('');
+    for (let i = 0; i < firstDay; i++) html += `<div class="dp-day empty"></div>`;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const iso = `${dpYear}-${String(dpMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const cls = [
+        'dp-day',
+        iso === today ? 'today' : '',
+        iso === selectedIso ? 'selected' : '',
+      ].filter(Boolean).join(' ');
+      html += `<div class="${cls}" onmousedown="pickDay(event,${d})">${d}</div>`;
+    }
+    dpGrid.innerHTML = html;
+  }
+
+  function pickDay(e, day) {
+    e.preventDefault();
+    const iso = `${dpYear}-${String(dpMonth+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    if (dpTargetInput) {
+      dpTargetInput.value = formatDateDisplay(iso);
+      dpTargetInput.style.color = '';
+    }
+    if (dpTargetId) {
+      const t = tasks.find(t => t.id === dpTargetId);
+      if (t) { t.start = iso; save(); applyDependencies(); tasks.forEach(task => updateEndDateCell(task)); updateProgress(); syncEstCloseDate(); }
+    }
+    closeDatePicker();
+  }
+
+  function closeDatePicker() {
+    dp.classList.remove('open');
+    dp.style.display = 'none';
+    dpTargetInput = null;
+    dpTargetId    = null;
+  }
+
+  document.getElementById('dpPrev').addEventListener('mousedown', e => { e.preventDefault(); dpMonth--; if (dpMonth < 0) { dpMonth = 11; dpYear--; } renderCalendar(); });
+  document.getElementById('dpNext').addEventListener('mousedown', e => { e.preventDefault(); dpMonth++; if (dpMonth > 11) { dpMonth = 0; dpYear++; } renderCalendar(); });
+
+  document.getElementById('dpClear').addEventListener('mousedown', e => {
+    e.preventDefault();
+    if (dpTargetInput) { dpTargetInput.value = ''; dpTargetInput.style.color = ''; }
+    if (dpTargetId) {
+      const t = tasks.find(t => t.id === dpTargetId);
+      if (t) { t.start = ''; save(); tasks.forEach(task => updateEndDateCell(task)); updateProgress(); syncEstCloseDate(); }
+    }
+    closeDatePicker();
+  });
+
+  document.getElementById('dpToday').addEventListener('mousedown', e => {
+    e.preventDefault();
+    const now = new Date();
+    dpYear  = now.getFullYear();
+    dpMonth = now.getMonth();
+    pickDay(e, now.getDate());
+  });
+
+  // Close picker on outside click
+  document.addEventListener('mousedown', function(e) {
+    if (dp.classList.contains('open') && !dp.contains(e.target) && !e.target.closest('.date-cell')) {
+      closeDatePicker();
+    }
+  });
+
+  // ── TOOLTIPS (single floating element, shows after mouse stops) ──
+  const floatTip = document.getElementById('floatTooltip');
+  let tooltipTimer = null;
+
+  function showTooltip(cell, text) {
+    floatTip.textContent = text;
+    floatTip.className = '';
+    floatTip.style.display = 'block';
+
+    const rect = cell.getBoundingClientRect();
+    const tipH = floatTip.offsetHeight;
+    const tipW = floatTip.offsetWidth;
+    const spaceAbove = rect.top;
+    const spaceBelow = window.innerHeight - rect.bottom;
+
+    let top, left;
+    if (spaceAbove >= tipH + 12 ) {
+      // place above
+      top = rect.top - tipH - 10;
+      floatTip.classList.add('tip-above');
+    } else {
+      // place below
+      top = rect.bottom + 10;
+      floatTip.classList.add('tip-below');
+    }
+
+    left = rect.left;
+    // clamp so it doesn't go off-screen right
+    if (left + tipW > window.innerWidth - 8) left = window.innerWidth - tipW - 8;
+    if (left < 8) left = 8;
+
+    floatTip.style.top  = top + 'px';
+    floatTip.style.left = left + 'px';
+  }
+
+  function hideTooltip() {
+    clearTimeout(tooltipTimer);
+    floatTip.style.display = 'none';
+  }
+
+  document.addEventListener('mousemove', function(e) {
+    const cell = e.target.closest('.notes-cell');
+    if (!cell) { hideTooltip(); return; }
+    const text = cell.dataset.tip || '';
+    if (!text.trim()) { hideTooltip(); return; }
+
+    clearTimeout(tooltipTimer);
+    tooltipTimer = setTimeout(() => showTooltip(cell, text), 500);
+  });
+
+  document.addEventListener('mouseout', function(e) {
+    if (!e.relatedTarget || !e.relatedTarget.closest('.notes-cell')) {
+      hideTooltip();
+    }
+  });
+
+  // Close modal on overlay click
+  document.getElementById('shareModal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('importModal').addEventListener('click', function(e) {
+    if (e.target === this) closeImportModal();
+  });
+
+  init();
+</script>
+</body>
+</html>
